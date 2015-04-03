@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preferences_screen_title">Create xAPI Actor Account</string>
+    <string name="preferences_key">org.adl.roses.preferences</string>
+    <string name="preferences_name_key">name</string>
+    <string name="preferences_email_key">email</string>
+    <string name="preference_send_init">send_init</string>
+</resources>

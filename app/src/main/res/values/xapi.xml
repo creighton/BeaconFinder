@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lrs_endpoint">https://lrs.adlnet.gov/xapi/</string>
+    <string name="lrs_user">tom</string>
+    <string name="lrs_password">1234</string>
+</resources>
