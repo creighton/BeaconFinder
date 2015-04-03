@@ -4,5 +4,6 @@
     <string name="preferences_key">org.adl.roses.preferences</string>
     <string name="preferences_name_key">name</string>
     <string name="preferences_email_key">email</string>
+    <string name="preferences_send_xapi_key">send_xapi</string>
     <string name="preference_send_init">send_init</string>
 </resources>

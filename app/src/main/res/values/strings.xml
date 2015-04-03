@@ -4,5 +4,6 @@
     <string name="app_name">Beacon Finder</string>
     <string name="action_settings">Settings</string>
     <string name="see_map_txt">See Map</string>
+    <string name="toggle_send_txt">Send xAPI Statements</string>
 
 </resources>

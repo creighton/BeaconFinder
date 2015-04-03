@@ -3,4 +3,15 @@
     <string name="lrs_endpoint">https://lrs.adlnet.gov/xapi/</string>
     <string name="lrs_user">tom</string>
     <string name="lrs_password">1234</string>
+
+    <string name="anon_user_name">unknown user</string>
+    <string name="anon_user_email">mailto:anon@example.com</string>
+
+    <string name="verb_iri_entered">http://tom.example.com/xapi/verbs/beacons/entered</string>
+    <string name="verb_en_display_entered">entered</string>
+
+    <string name="verb_iri_exited">http://tom.example.com/xapi/verbs/beacons/exited</string>
+    <string name="verb_en_display_exited">exited</string>
+    
+    <string name="beacon_baseiri">http://tom.example.com/xapi/activities/beacons/</string>
 </resources>

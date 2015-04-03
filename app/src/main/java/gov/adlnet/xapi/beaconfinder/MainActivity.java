@@ -1,18 +1,25 @@
 package gov.adlnet.xapi.beaconfinder;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,6 +50,11 @@ public class MainActivity extends ActionBarActivity {
     private BeaconListAdapter beaconListAdapter;
     public static ArrayList<MyBeaconInfo> beaconArray = new ArrayList<>();
 
+    private String actor_email;
+    private String actor_name;
+
+    private XAPIUtil xapiutil;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Gimbal.setApiKey(this.getApplication(), getString(R.string.api_key));
@@ -56,13 +68,16 @@ public class MainActivity extends ActionBarActivity {
 
         if(tmpName == null || tmpEmail == null)
         {
-            //launchSettings();
+            launchSettings();
         }
         else
         {
-//            _actor_email = tmpEmail;
-//            _actor_name = tmpName;
+            actor_email = tmpEmail;
+            actor_name = tmpName;
         }
+
+        //xapi setup
+        xapiutil = new XAPIUtil(this);
 
         beaconListAdapter = new BeaconListAdapter(this, beaconArray);
 
@@ -91,14 +106,17 @@ public class MainActivity extends ActionBarActivity {
         placeEventListener = new PlaceEventListener() {
             @Override
             public void onEntry(Place place, long timestamp) {
-
+                Log.d("onEntry", "place: " + place.getIdentifier() + ": " + place.getName());
+                xapiutil.sendEntered(place, timestamp);
             }
 
             @Override
             public void onExit(Place place, long entryTimestamp, long exitTimestamp) {
+                Log.d("onExit", "place: " + place.getIdentifier() + ": " + place.getName());
                 Beacon b = new Beacon();
                 b.setIdentifier(place.getIdentifier());
                 removeBeacon(new MyBeaconInfo(b, 0, exitTimestamp));
+                xapiutil.sendExited(place, entryTimestamp, exitTimestamp);
             }
         };
         PlaceManager.getInstance().addPlaceEventListener(placeEventListener);
@@ -143,6 +161,7 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            launchSettings();
             return true;
         }
 
@@ -207,6 +226,59 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         timer.schedule(checkBeacons, 30000, 30000); //execute in every 30000 ms
+    }
+
+    private void launchSettings(){
+        // build the view and inflate
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final LayoutInflater inflater = this.getLayoutInflater();
+        final View settings = inflater.inflate(R.layout.dialog_actor, null);
+
+        // get any saved data
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.preferences_key), MODE_PRIVATE);
+        String tmpName = prefs.getString(getString(R.string.preferences_name_key), null);
+        String tmpEmail = prefs.getString(getString(R.string.preferences_email_key), null);
+        boolean tmpXapi = prefs.getBoolean(getString(R.string.preferences_send_xapi_key), true);
+
+        // populate saved data in form
+        if (tmpName != null)
+        {
+            EditText ed_name = (EditText) settings.findViewById(R.id.name);
+            ed_name.setText(tmpName);
+        }
+        if (tmpEmail != null)
+        {
+            EditText ed_email = (EditText) settings.findViewById(R.id.email);
+            ed_email.setText(tmpEmail);
+        }
+        CheckBox cb_send_xapi = (CheckBox) settings.findViewById(R.id.send_xapi);
+        cb_send_xapi.setChecked(tmpXapi);
+
+        // set props and positive button
+        builder.setTitle(getString(R.string.preferences_screen_title));
+        builder.setView(settings)
+                .setPositiveButton("Set", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Dialog d = (Dialog) dialog;
+                        EditText ed1 = (EditText) d.findViewById(R.id.name);
+                        actor_name = ed1.getText().toString();
+
+                        EditText ed2 = (EditText) d.findViewById(R.id.email);
+                        actor_email = ed2.getText().toString();
+
+                        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preferences_key), MODE_PRIVATE).edit();
+                        editor.putString(getString(R.string.preferences_name_key), actor_name);
+                        editor.putString(getString(R.string.preferences_email_key), actor_email);
+                        editor.putBoolean(getString(R.string.preferences_send_xapi_key), ((CheckBox)d.findViewById(R.id.send_xapi)).isChecked());
+
+                        editor.commit();
+                    }
+                });
+
+        // build and show
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private class BeaconListAdapter extends ArrayAdapter<MyBeaconInfo> {

@@ -38,5 +38,6 @@ dependencies {
     compile files('libs/gimbal-dev-logging.jar')
     compile files('libs/spring-android-core-1.0.1.RELEASE.jar')
     compile files('libs/spring-android-rest-template-1.0.1.RELEASE.jar')
-    compile files('libs/xapi-0.1.2.jar')
+    compile files('libs/xapi.jar')
+    compile files('libs/joda-time-2.7.jar')
 }
