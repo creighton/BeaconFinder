@@ -14,4 +14,6 @@
     <string name="verb_en_display_exited">exited</string>
     
     <string name="beacon_baseiri">http://tom.example.com/xapi/activities/beacons/</string>
+
+    <string name="context_category">http://tom.example.com/xapi/context/categories/beacons</string>
 </resources>

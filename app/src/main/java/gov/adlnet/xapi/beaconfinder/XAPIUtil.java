@@ -17,7 +17,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import gov.adlnet.xapi.client.StatementClient;
@@ -25,6 +27,7 @@ import gov.adlnet.xapi.model.Activity;
 import gov.adlnet.xapi.model.ActivityDefinition;
 import gov.adlnet.xapi.model.Actor;
 import gov.adlnet.xapi.model.Agent;
+import gov.adlnet.xapi.model.ContextActivities;
 import gov.adlnet.xapi.model.IStatementObject;
 import gov.adlnet.xapi.model.Result;
 import gov.adlnet.xapi.model.Statement;
@@ -76,6 +79,7 @@ public class XAPIUtil {
         s.setVerb(ENTERED);
         s.setObject(getActivity(place));
         s.setTimestamp(convertToISO8601(timestamp));
+        s.setContext(getContext(place));
         new SendTask().execute(s);
     }
 
@@ -86,7 +90,18 @@ public class XAPIUtil {
         s.setObject(getActivity(place));
         s.setTimestamp(convertToISO8601(exitTimestamp));
         s.setResult(getResultDuration(entryTimestamp, exitTimestamp));
+        s.setContext(getContext(place));
         new SendTask().execute(s);
+    }
+
+    private gov.adlnet.xapi.model.Context getContext(Place place) {
+        gov.adlnet.xapi.model.Context c = new gov.adlnet.xapi.model.Context();
+        ContextActivities ctx_acts = new ContextActivities();
+        ArrayList<Activity> a = new ArrayList<>();
+        a.add(new Activity(ctx.getString(R.string.context_category)));
+        ctx_acts.setCategory(a);
+        c.setContextActivities(ctx_acts);
+        return c;
     }
 
     private Result getResultDuration(long entryTimestamp, long exitTimestamp) {
